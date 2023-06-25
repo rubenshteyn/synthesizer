@@ -10,9 +10,6 @@
   "dependencies": {
     "uuid": "^9.0.0",
     "vue": "^3.3.4",
-    "vue-draggable-next": "^2.2.1",
-    "vue3-draggable": "^2.0.9",
-    "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

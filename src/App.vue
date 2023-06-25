@@ -1,6 +1,5 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
-import {VueDraggableNext} from 'vue-draggable-next'
 import ModalService from "@/components/modals/ModalService.vue";
 import IconArrowRight from "@/components/icons/IconArrowRight.vue";
 import IconArrowLeft from "@/components/icons/IconArrowLeft.vue";
@@ -22,7 +21,6 @@ export default {
     IconArrowLeft,
     IconArrowRight,
     ModalService,
-    draggable: VueDraggableNext,
   },
 
   mounted() {
