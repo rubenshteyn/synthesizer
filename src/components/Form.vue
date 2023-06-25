@@ -1,7 +1,6 @@
 <script>
 import {v4 as uuidv4} from "uuid";
 import {mapActions} from "vuex";
-import {f} from "vuedraggable/dist/vuedraggable.common";
 
 export default {
   name: "Form",
