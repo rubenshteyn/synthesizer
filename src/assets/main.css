@@ -1,5 +1,9 @@
 @import './base.css';
 
+body {
+    background: #ffffff;
+}
+
 main {
     display: flex;
     width: 100%;
