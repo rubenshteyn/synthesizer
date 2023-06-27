@@ -91,7 +91,7 @@ export default {
         },
 
         updateTimerMethod(context) {
-            return context.commit("ADD_SYNTHESIS_TIMER", )
+            return context.commit("ADD_SYNTHESIS_TIMER")
         },
 
         updateSynthesisCompletedMethod(context) {
