@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: {
         timer: 0,
-        amountCompleted: 0,
+        amountCompleted: 4,
         currentNucleotide: null,
         status: "Бездействует",
         synthesis: {
@@ -83,27 +83,27 @@ export default {
         },
 
         updateStatusSynthesisMethod(context, data) {
-            return context.commit("UPDATE_SYNTHESIS", data)
+            context.commit("UPDATE_SYNTHESIS", data)
         },
 
         subtractionTimeMethod(context) {
-            return context.commit("UPDATE_SYNTHESIS_TIMER")
+            context.commit("UPDATE_SYNTHESIS_TIMER")
         },
 
         updateTimerMethod(context) {
-            return context.commit("ADD_SYNTHESIS_TIMER")
+            context.commit("ADD_SYNTHESIS_TIMER")
         },
 
         updateSynthesisCompletedMethod(context) {
-            return context.commit("ADD_SYNTHESIS_COMPLETED")
+            context.commit("ADD_SYNTHESIS_COMPLETED")
         },
 
         updateCurrentNucleotideMethod(context, currentNucleotide) {
-            return context.commit("ADD_CURRENT_NUCLEOTIDE", currentNucleotide)
+            context.commit("ADD_CURRENT_NUCLEOTIDE", currentNucleotide)
         },
 
         updateStatusMethod(context, status) {
-            return context.commit("ADD_STATUS", status)
+            context.commit("ADD_STATUS", status)
         },
     },
 
