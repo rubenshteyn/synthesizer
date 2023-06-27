@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: {
         timer: 0,
-        amountCompleted: 4,
+        amountCompleted: 0,
         currentNucleotide: null,
         status: "Бездействует",
         synthesis: {
