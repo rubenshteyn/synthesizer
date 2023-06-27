@@ -9,7 +9,7 @@ export default {
             synthesisHigh: [],
             synthesisMedium: [],
             synthesisLow: [],
-        },
+        }
     },
     mutations: {
         ADD_STATUS(state, status) {
@@ -18,171 +18,84 @@ export default {
         ADD_CURRENT_NUCLEOTIDE(state, currentNucleotide) {
             state.currentNucleotide = currentNucleotide;
         },
-        ADD_SYNTHESIS_COMPLETED(state, amountCompleted) {
-            state.amountCompleted = amountCompleted;
+        ADD_SYNTHESIS_COMPLETED(state) {
+            state.amountCompleted = state.amountCompleted + 1;
         },
-        ADD_SYNTHESIS_TIMER(state, timer) {
-            state.timer = timer;
+        ADD_SYNTHESIS_TIMER(state) {
+            const queues = Object.keys(state.synthesis)
+            let arrNucleotides = [0]
+            queues.forEach(queue => {
+                state.synthesis[queue].forEach(synthes => {
+                    arrNucleotides.push(synthes.nucleotides.length)
+                })
+            })
+            state.timer = arrNucleotides.reduce((a, b) => a + b);
         },
-        ADD_SYNTHESIS_HIGH(state, synthesis) {
-            state.synthesis.synthesisHigh = synthesis;
+        UPDATE_SYNTHESIS_TIMER(state) {
+            if (state.timer === 0) {
+                state.timer = 0
+            }
+            state.timer = state.timer - 1;
         },
-        ADD_SYNTHESIS_MEDIUM(state, synthesis) {
-            state.synthesis.synthesisMedium = synthesis;
+        UPDATE_PRIORITY(state, data) {
+            data.synthes.priority = data.futureQueue
+            state.synthesis[data.futureQueue] = [...state.synthesis[data.futureQueue], data.synthes];
         },
-        ADD_SYNTHESIS_LOW(state, synthesis) {
-            state.synthesis.synthesisLow = synthesis;
-        }
+        UPDATE_NUCLEOTIDES(state, data) {
+            state.synthesis[data.queue] = state.synthesis[data.queue].filter((synthesis) => {
+                if (synthesis.id === data.synthes.id) {
+                    synthesis.nucleotides = data.nucleotides
+                }
+                return synthesis
+            });
+        },
+        DELETE_SYNTHESIS(state, data) {
+            state.synthesis[data.queue] = state.synthesis[data.queue].filter((synthesis) => synthesis.id !== data.synthes.id)
+        },
+        ADD_SYNTHESIS(state, data) {
+            state.synthesis[data.synthes.priority] = [...state.synthesis[data.synthes.priority], data.synthes]
+        },
+        UPDATE_SYNTHESIS(state, data) {
+            state.synthesis[data.queue] = state.synthesis[data.queue].filter((synthesis) => {
+                if (synthesis.id === data.synthes.id) {
+                    synthesis.work = data.synthes.work
+                }
+                return synthesis
+            })
+        },
     },
     actions: {
-        addSynthesisMethod(context, form) {
-            let updateState
-            if (form.priority === "high") {
-                updateState = [...context.state.synthesis.synthesisHigh, form]
-                return context.commit("ADD_SYNTHESIS_HIGH", updateState)
-            }
-            if (form.priority === "medium") {
-                updateState = [...context.state.synthesis.synthesisMedium, form]
-                return context.commit("ADD_SYNTHESIS_MEDIUM", updateState)
-            }
-            if (form.priority === "low") {
-                updateState = [...context.state.synthesis.synthesisLow, form]
-                return context.commit("ADD_SYNTHESIS_LOW", updateState)
-            }
+        addSynthesisMethod(context, data) {
+            context.commit("ADD_SYNTHESIS", data)
         },
 
         updatePriorityMethod(context, data) {
-            if (data.synthes.priority === "high" && data.futurePriority === "low") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_LOW", [...context.state.synthesis.synthesisLow, data.synthes])
-                context.commit("ADD_SYNTHESIS_HIGH", context.state.synthesis.synthesisHigh.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
-
-            if (data.synthes.priority === "high" && data.futurePriority === "medium") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_MEDIUM", [...context.state.synthesis.synthesisMedium, data.synthes])
-                context.commit("ADD_SYNTHESIS_HIGH", context.state.synthesis.synthesisHigh.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
-
-            if (data.synthes.priority === "medium" && data.futurePriority === "high") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_HIGH", [...context.state.synthesis.synthesisHigh, data.synthes])
-                context.commit("ADD_SYNTHESIS_MEDIUM", context.state.synthesis.synthesisMedium.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
-
-            if (data.synthes.priority === "medium" && data.futurePriority === "low") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_LOW", [...context.state.synthesis.synthesisLow, data.synthes])
-                context.commit("ADD_SYNTHESIS_MEDIUM", context.state.synthesis.synthesisMedium.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
-
-            if (data.synthes.priority === "low" && data.futurePriority === "medium") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_MEDIUM", [...context.state.synthesis.synthesisMedium, data.synthes])
-                context.commit("ADD_SYNTHESIS_LOW", context.state.synthesis.synthesisLow.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
-
-            if (data.synthes.priority === "low" && data.futurePriority === "high") {
-                data.synthes.priority = data.futurePriority
-                context.commit("ADD_SYNTHESIS_HIGH", [...context.state.synthesis.synthesisHigh, data.synthes])
-                context.commit("ADD_SYNTHESIS_LOW", context.state.synthesis.synthesisLow.filter((synthesis) => synthesis.id !== data.synthes.id))
-            }
+            context.commit("DELETE_SYNTHESIS", data)
+            context.commit("UPDATE_PRIORITY", data)
         },
 
         updateNucleotidesMethod(context, data) {
-            if (data.synthes.priority === "high") {
-                context.commit("ADD_SYNTHESIS_HIGH", context.state.synthesis.synthesisHigh.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.nucleotides = data.nucleotides
-                    }
-                    return synthesis
-                }))
-            }
-            if (data.synthes.priority === "medium") {
-                context.commit("ADD_SYNTHESIS_MEDIUM", context.state.synthesis.synthesisMedium.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.nucleotides = data.nucleotides
-                    }
-                    return synthesis
-                }))
-            }
-            if (data.synthes.priority === "low") {
-                context.commit("ADD_SYNTHESIS_LOW", context.state.synthesis.synthesisLow.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.nucleotides = data.nucleotides
-                    }
-                    return synthesis
-                }))
-            }
+            context.commit("UPDATE_NUCLEOTIDES", data)
         },
 
-        deleteSynthesisMethod(context, form) {
-            let updateState
-            if (form.priority === "high") {
-                updateState = context.state.synthesis.synthesisHigh.filter((synthesis) => synthesis.id !== form.id)
-                return context.commit("ADD_SYNTHESIS_HIGH", updateState)
-            }
-            if (form.priority === "medium") {
-                updateState = context.state.synthesis.synthesisMedium.filter((synthesis) => synthesis.id !== form.id)
-                return context.commit("ADD_SYNTHESIS_MEDIUM", updateState)
-            }
-            if (form.priority === "low") {
-                updateState = context.state.synthesis.synthesisLow.filter((synthesis) => synthesis.id !== form.id)
-                return context.commit("ADD_SYNTHESIS_LOW", updateState)
-            }
+        deleteSynthesisMethod(context, data) {
+            context.commit("DELETE_SYNTHESIS", data)
         },
 
         updateStatusSynthesisMethod(context, data) {
-            if (data.synthes.priority === "high") {
-                context.commit("ADD_SYNTHESIS_HIGH", context.state.synthesis.synthesisHigh.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.work = data.work
-                    }
-                    return synthesis
-                }))
-            }
-            if (data.synthes.priority === "medium") {
-                context.commit("ADD_SYNTHESIS_MEDIUM", context.state.synthesis.synthesisMedium.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.work = data.work
-                    }
-                    return synthesis
-                }))
-            }
-            if (data.synthes.priority === "low") {
-                context.commit("ADD_SYNTHESIS_LOW", context.state.synthesis.synthesisLow.filter((synthesis) => {
-                    if (synthesis.id === data.synthes.id) {
-                        synthesis.work = data.work
-                    }
-                    return synthesis
-                }))
-            }
+            return context.commit("UPDATE_SYNTHESIS", data)
         },
 
         subtractionTimeMethod(context) {
-            let stateTimer = context.state.timer
-            if (stateTimer === 0) {
-                return context.commit("ADD_SYNTHESIS_TIMER", 0)
-            }
-            return context.commit("ADD_SYNTHESIS_TIMER", stateTimer - 1)
+            return context.commit("UPDATE_SYNTHESIS_TIMER")
         },
 
         updateTimerMethod(context) {
-            let arrNucleotides = [0]
-            context.state.synthesis.synthesisHigh.forEach(synthes => {
-                arrNucleotides.push(synthes.nucleotides.length)
-            })
-            context.state.synthesis.synthesisMedium.forEach(synthes => {
-                arrNucleotides.push(synthes.nucleotides.length)
-            })
-            context.state.synthesis.synthesisLow.forEach(synthes => {
-                arrNucleotides.push(synthes.nucleotides.length)
-            })
-            return context.commit("ADD_SYNTHESIS_TIMER", arrNucleotides.reduce((a, b) => a + b))
+            return context.commit("ADD_SYNTHESIS_TIMER", )
         },
 
         updateSynthesisCompletedMethod(context) {
-            return context.commit("ADD_SYNTHESIS_COMPLETED", context.state.amountCompleted + 1)
+            return context.commit("ADD_SYNTHESIS_COMPLETED")
         },
 
         updateCurrentNucleotideMethod(context, currentNucleotide) {

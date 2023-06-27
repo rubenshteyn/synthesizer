@@ -6,6 +6,7 @@ import IconArrowLeft from "@/components/icons/IconArrowLeft.vue";
 import Nucleotides from "@/components/Nucleotides.vue";
 import Form from "@/components/Form.vue";
 import Tasks from "@/components/Tasks.vue";
+import StateInfo from "@/components/StateInfo.vue";
 
 export default {
   data() {
@@ -15,6 +16,7 @@ export default {
     }
   },
   components: {
+    StateInfo,
     Tasks,
     Form,
     Nucleotides,
@@ -48,8 +50,12 @@ export default {
           && this.amountWorks === 0) {
 
         const data = {
-          work: true,
-          synthes: this.synthesis[priority][0]
+          synthes: {
+            id: this.synthesis[priority][0].id,
+            work: true,
+            nucleotides: this.synthesis[priority][0].nucleotides
+          },
+          queue: priority
         }
         this.updateStatus("Занят")
         this.statusUpdate(data)
@@ -64,7 +70,7 @@ export default {
 
         setTimeout(() => {
           this.updateCurrentNucleotide(null)
-          this.delete(this.synthesis[priority][0])
+          this.delete({synthes: this.synthesis[priority][0], queue: priority})
           this.updateSynthesisCompleted()
           this.updateTimer()
           this.counter = 0
@@ -117,11 +123,14 @@ export default {
 <template>
   <main>
     <div v-if="work()" class="synthesizer">
-      <div class="synthesizer__block">
+      <div class="synthesizer__block state--block">
         <Nucleotides/>
-        <Form/>
+        <StateInfo />
       </div>
-      <Tasks/>
+      <div class="synthesizer__block">
+        <Form/>
+        <Tasks/>
+      </div>
     </div>
     <ModalService v-else/>
   </main>

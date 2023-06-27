@@ -6,6 +6,7 @@ export default {
     return {
       name: "ModalChange",
       synthes: null,
+      queue: null,
       newNucleotides: null,
       visible: false,
       error: null
@@ -22,7 +23,8 @@ export default {
       if (!this.synthes.work) {
         const data = {
           nucleotides: this.newNucleotides.toLowerCase().split(""),
-          synthes: this.synthes
+          synthes: this.synthes,
+          queue: this.queue
         }
         this.updateNucleotides(data)
         this.updateStatus("Бездействует")
@@ -31,13 +33,14 @@ export default {
       }
     },
     deleteSynthes() {
-      this.delete(this.synthes)
+      this.delete({synthes: this.synthes, queue: this.queue})
       this.updateStatus("Бездействует")
       this.updateTimer()
       this.visible = false
     },
-    openModal(synthes) {
+    openModal(synthes, queue) {
       this.synthes = synthes
+      this.queue = queue
       this.newNucleotides = synthes.nucleotides.join("")
       this.updateStatus("Редактирование")
       this.visible = true
@@ -48,29 +51,28 @@ export default {
       const regular = /^([a, t, g, c]+|\d+)$/i;
       if (!this.newNucleotides) {
         this.error = null
-        return false
+        return true
       }
 
       if (!regular.test(this.newNucleotides)) {
-        this.error = "Введите корректную формулу!"
+        this.error = "Введите валидные символы: a, t, g, c"
         return true
       }
 
       if (this.newNucleotides.length < 6) {
-        this.error = "Слишком короткая формула!"
+        this.error = "Длина формулы не менее 6 нуклеотидов"
         return true
       }
 
       if (this.newNucleotides.length > 120) {
-        this.error = "Слишком длинная формула!"
+        this.error = "Длина формулы не более 120 нуклеотидов"
         return true
       }
 
       if (!this.newNucleotides || !regular.test(this.newNucleotides)) {
         return true
       }
-      return false
-    }
+    },
   }
 }
 </script>
@@ -78,7 +80,7 @@ export default {
 <template>
   <div v-show="visible" class="modal">
     <div class="modal--content">
-      <p v-show="isChanged" class="error--formula">{{ this.error }}</p>
+      <p v-show="isChanged" :class="!this.error ? 'error--formula' : 'error--formula visible'"><span>{{ this.error }}</span></p>
       <input v-model="newNucleotides" placeholder="Введите формулу" class="synthesis__description error--border" />
       <div class="synthesis__btns">
         <button :disabled="isChanged" @click="changeNucleotides()" class="synthesis__btn medium">Изменить</button>
@@ -90,11 +92,13 @@ export default {
 
 <style scoped>
 .error--formula {
-  padding: 10px 20px;
   border-radius: 10px;
   top: -3em;
   background-color: #d73838;
   color: #fff;
+}
+.visible {
+  padding: 10px 20px;
 }
 .modal {
   position: absolute;

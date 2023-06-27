@@ -3,34 +3,24 @@ import IconArrowLeft from "@/components/icons/IconArrowLeft.vue";
 import IconArrowRight from "@/components/icons/IconArrowRight.vue";
 import {mapActions} from "vuex";
 import ModalChange from "@/components/modals/ModalChange.vue";
+import Task from "@/components/Task.vue";
 
 export default {
   name: "Table",
-  data() {
-    return {
-      newNucleotides: null,
-      visible: false,
-      visibleForm: false
-    }
-  },
-  components: {ModalChange, IconArrowLeft, IconArrowRight},
-  props: ['synthesis', 'title', 'leftPriority', 'rightPriority'],
+  components: {Task, ModalChange, IconArrowLeft, IconArrowRight},
+  props: ['synthesis', 'title', 'leftPriority', 'rightPriority', 'queue'],
   methods: {
     ...mapActions({
       "update": "synthesizer/updatePriorityMethod"
     }),
-    updatePriority(synthes, futurePriority) {
+    updatePriority(synthes, futureQueue) {
       if (!synthes.work) {
         let data = {
-          futurePriority: futurePriority,
-          synthes: synthes
+          futureQueue: futureQueue,
+          synthes: synthes,
+          queue: this.queue
         }
         this.update(data)
-      }
-    },
-    showChangeModal(synthes, ref) {
-      if(!synthes.work) {
-        this.$refs.change.openModal(synthes)
       }
     },
   },
@@ -40,14 +30,13 @@ export default {
 <template>
   <div class="task">
     <span class="task--title">{{ title }}</span>
-    <ModalChange ref="change"/>
     <div v-for="synthes in synthesis" class="task--body">
       <div :class="synthes.work ? 'synthes--work synthes--block' : 'synthes--block'">
         <button @click="updatePriority(synthes, leftPriority)" class="btn--priority">
           <IconArrowLeft/>
         </button>
 
-        <span @click="showChangeModal(synthes)">{{ synthes.nucleotides.join("") }}</span>
+        <Task :synthes="synthes" :queue="queue"/>
 
         <button @click="updatePriority(synthes, rightPriority)" class="btn--priority">
           <IconArrowRight/>
@@ -56,3 +45,4 @@ export default {
     </div>
   </div>
 </template>
+

@@ -7,7 +7,7 @@ export default {
   data() {
     return {
       formula: null,
-      priority: "medium",
+      priority: "synthesisMedium",
       error: null
     }
   },
@@ -18,10 +18,12 @@ export default {
     }),
     createTask() {
       let form = {
-        id: uuidv4(),
-        nucleotides: this.formula.toLowerCase().split(""),
-        priority: this.priority,
-        work: false
+        synthes: {
+          id: uuidv4(),
+          nucleotides: this.formula.toLowerCase().split(""),
+          priority: this.priority,
+          work: false
+        }
       }
       this.create(form)
       this.updateTimer()
@@ -36,21 +38,21 @@ export default {
       const regular = /^([a, t, g, c]+|\d+)$/i;
       if (!this.formula) {
         this.error = null
-        return false
+        return true
       }
 
       if (!regular.test(this.formula)) {
-        this.error = "Введите корректную формулу!"
+        this.error = "Введите валидные символы: a, t, g, c"
         return true
       }
 
       if (this.formula.length < 6) {
-        this.error = "Слишком короткая формула!"
+        this.error = "Длина формулы не менее 6 нуклеотидов"
         return true
       }
 
       if (this.formula.length > 120) {
-        this.error = "Слишком длинная формула!"
+        this.error = "Длина формулы не более 120 нуклеотидов"
         return true
       }
 
@@ -70,6 +72,26 @@ export default {
 
 <template>
   <div class="synthesis__form">
+    <div class="synthesis--priority">
+      <p class="priority--title">Выберите приоритет:</p>
+      <div class="synthesis__btns">
+        <button
+            @click="addPriority('synthesisHigh')"
+            :class="priority === 'synthesisHigh' ? 'synthesis__btn high opacity' : 'synthesis__btn high'">
+          Высокий
+        </button>
+        <button
+            @click="addPriority('synthesisMedium')"
+            :class="priority === 'synthesisMedium' ? 'synthesis__btn medium opacity' : 'synthesis__btn medium'">
+          Средний
+        </button>
+        <button
+            @click="addPriority('synthesisLow')"
+            :class="priority === 'synthesisLow' ? 'synthesis__btn low opacity' : 'synthesis__btn low'">
+          Низкий
+        </button>
+      </div>
+    </div>
     <div class="synthesis__block">
       <p v-if="isChanged" class="error--formula">{{ this.error }}</p>
       <input
@@ -85,26 +107,6 @@ export default {
           class="synthesis__btn submit">
         Синтез
       </button>
-    </div>
-    <div class="synthesis--priority">
-      <p class="priority--title">Выберите приоритет:</p>
-      <div class="synthesis__btns">
-        <button
-            @click="addPriority('high')"
-            :class="priority === 'high' ? 'synthesis__btn high opacity' : 'synthesis__btn high'">
-          Высокий
-        </button>
-        <button
-            @click="addPriority('medium')"
-            :class="priority === 'medium' ? 'synthesis__btn medium opacity' : 'synthesis__btn medium'">
-          Средний
-        </button>
-        <button
-            @click="addPriority('low')"
-            :class="priority === 'low' ? 'synthesis__btn low opacity' : 'synthesis__btn low'">
-          Низкий
-        </button>
-      </div>
     </div>
   </div>
 </template>
