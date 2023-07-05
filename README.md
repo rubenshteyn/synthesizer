@@ -7,9 +7,9 @@
 У синтезатора есть 4 состояния: Занят, Бездействует, На обслуживании, Редактирование. Чтобы редактировать или удалить формулу в очереди задач, нажмите на нужную, синтезатор завершит текущую задачу и получит статус "Редактирование". По умолчанию при создании задачи её приоритет "Medium". Задачу, которая обрабатывается синтезатором(подсвечена зелёным) нельзя редактировать или удалять. Задачи выполняются по приоритету. На колбах видно который из нуклеотидов сейчас синтезируется в текущей формуле
 
 # Screenshots
-![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/screenshots/frame.png)
-![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/screenshots/modal.png)
-![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/screenshots/changeForm.png)
+![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/assets/img/screenshots/frame.png)
+![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/assets/img/screenshots/modal.png)
+![Image alt](https://github.com/rubenshteyn/synthesizer/blob/main/src/assets/img/screenshots/changeForm.png)
 
 ## Project Setup
 
