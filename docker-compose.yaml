@@ -1,0 +1,10 @@
+version: "16.4.1"
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "synthesizer"
+      POSTGRES_USER: "synthesizer_admin"
+      POSTGRES_PASSWORD: "synthesizer_admin_password"
+    ports:
+      - "5432:5432"
