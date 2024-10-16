@@ -9,8 +9,10 @@ import (
 
 func SetupRouter(db *sql.DB) *mux.Router {
 	router := mux.NewRouter()
+	router.HandleFunc("/login", controllers.Login(db)).Methods("POST")
+	router.HandleFunc("/authorization", controllers.Authentication(db)).Methods("POST")
+
 	router.HandleFunc("/users", controllers.GetUsers(db)).Methods("GET")
-	router.HandleFunc("/users", controllers.CreateUser(db)).Methods("POST")
 	router.HandleFunc("/users", controllers.UpdateUser(db)).Methods("PUT")
 
 	router.HandleFunc("/tasks", controllers.GetTasks(db)).Methods("GET")
