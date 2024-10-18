@@ -23,8 +23,8 @@ func checkPassword(hashedPassword, password string) error {
 }
 
 func GetUsers(db *sql.DB) http.HandlerFunc {
-	var users []models.User
 	return func(w http.ResponseWriter, r *http.Request) {
+		var users []models.User
 		rows, err := db.Query("SELECT id, name, password FROM users")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,7 +38,7 @@ func GetUsers(db *sql.DB) http.HandlerFunc {
 			}
 			users = append(users, user)
 		}
-
+		rows.Close()
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(users)
 	}
@@ -49,18 +49,15 @@ func Authentication(db *sql.DB) http.HandlerFunc {
 		var user models.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			http.Error(w, "bad_request", http.StatusBadRequest)
 			return
 		}
 
-		// var name string
-		// getUserQuery := "SELECT user FROM users WHERE name = $1"
-		// userIsExist := db.QueryRow(getUserQuery, user.Name).Scan(&name)
-		// fmt.Println("userIsExist", userIsExist)
-		// if userIsExist != nil {
-		// 	http.Error(w, "User is exist", http.StatusNotFound)
-		// 	return
-		// }
+		exist := db.QueryRow("SELECT name FROM users WHERE name = $1", user.Name).Scan(&user.Name)
+		if exist == nil {
+			http.Error(w, "is_exist", http.StatusBadRequest)
+			return
+		}
 
 		hashedPassword, err := hashPassword(user.Password)
 		if err != nil {
@@ -69,7 +66,7 @@ func Authentication(db *sql.DB) http.HandlerFunc {
 
 		err = db.QueryRow("INSERT INTO users(name, password) VALUES($1, $2) RETURNING id", user.Name, hashedPassword).Scan(&user.Id)
 		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			http.Error(w, "internal", http.StatusInternalServerError)
 			return
 		}
 
@@ -83,20 +80,20 @@ func Login(db *sql.DB) http.HandlerFunc {
 		var user models.User
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			http.Error(w, "bad_request", http.StatusBadRequest)
 			return
 		}
 
 		var hashedPassword string
 		err = db.QueryRow("SELECT password FROM users WHERE name=$1", user.Name).Scan(&hashedPassword)
 		if err != nil {
-			http.Error(w, "User was not found", http.StatusNotFound)
+			http.Error(w, "not_found", http.StatusNotFound)
 			return
 		}
 
 		err = checkPassword(hashedPassword, user.Password)
 		if err != nil {
-			http.Error(w, "Incorrect password", http.StatusBadRequest)
+			http.Error(w, "incorrect_password", http.StatusBadRequest)
 			return
 		}
 
@@ -105,7 +102,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 		if isAlreadyAuth != true {
 			err = CreateSession(w, r, user.Name)
 			if err != nil {
-				http.Error(w, "Bad request", http.StatusBadRequest)
+				http.Error(w, "bad_request", http.StatusBadRequest)
 				return
 			}
 		}

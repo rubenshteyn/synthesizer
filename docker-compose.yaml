@@ -1,10 +1,32 @@
-version: "16.4.1"
+version: '3.8'
+
 services:
-  postgres:
-    image: postgres:13.3
+  db:
+    image: postgres:latest
     environment:
-      POSTGRES_DB: "synthesizer"
-      POSTGRES_USER: "synthesizer_admin"
-      POSTGRES_PASSWORD: "synthesizer_admin_password"
+      POSTGRES_DB: synthesizer
+      POSTGRES_USER: synthesizer_admin
+      POSTGRES_PASSWORD: synthesizer_admin_password
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+
+  client:
+    build:
+      context: ./client
+    volumes:
+      - ./client:/app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
